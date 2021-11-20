@@ -233,6 +233,59 @@ public class Calculations {
         }
     }
 
+    public void abstractMotorCalc (double xVal, double yVal, double rotation, double maxVelocity, double rotationalVangle, CANSparkMax driveMotor, CANSparkMax turnMotor, Encoder turnEncoder ) {
+        double maxWheelVeolcity = maxVelocity; //feet per second at full power
+        double maxRotationalVelocity = Math.PI*2*Math.sqrt(2);
+
+        double errValue = 0; //rotation optimizer
+        boolean rotationDirection; //rotation optimizer cw=true ccw = false
+        double xInputVelocity = xVal * maxWheelVeolcity;
+        double yInputVelocity = yVal * maxWheelVeolcity;
+        double rotationalV = (-rotation * maxRotationalVelocity);
+        double resultantX = xInputVelocity + (Math.cos(rotationalVangle)*(rotationalV));
+        double resultantY = yInputVelocity + ((Math.sin(rotationalVangle))*(rotationalV));
+        double resultantVectors = Math.sqrt(Math.pow(resultantX, 2)+Math.pow(resultantY, 2));
+
+        double resultantAngle = Math.atan(resultantY/resultantX);
+        if (resultantX <= 0+.01) {
+            resultantAngle += Math.PI;
+        } else if (resultantX > 0 && resultantY <=0 )
+        {
+            
+            resultantAngle += (2*Math.PI);
+        }
+        double motorOutput = resultantVectors/85;
+        //SmartDashboard.putNumber("Resultant Value", resultantVectors);
+        //SmartDashboard.putNumber("Resultant Angle", resultantAngle);
+        //SmartDashboard.putNumber("Motor Output", motorOutput);
+        double encoderRotation = (((turnEncoder.getRaw()/4096.000000)%1)*(2*Math.PI));
+        SmartDashboard.putNumber("RawValue", encoderRotation);
+        if (encoderRotation < 0 ) {
+            encoderRotation *= -1;
+        } else {
+            encoderRotation = (2 * Math.PI) - encoderRotation;
+        }
+        //SmartDashboard.putNumber("Encoder", encoderRotation);
+        driveMotor.set(-motorOutput);
+        
+        double rawDistanceFromSetpoint = encoderRotation - resultantAngle;
+        double limitedDistance = rawDistanceFromSetpoint % (2 * Math.PI);
+
+        if (limitedDistance < Math.PI) {
+            rotationDirection = limitedDistance > 0 ? true : false;
+        }
+        else {
+            rotationDirection = limitedDistance > 0 ? false : true;
+        }
+        if (Math.abs(limitedDistance) > (Math.PI / 32)){
+            turnMotor.set(rotationDirection ? -0.05 : 0.05);
+        }
+        else {
+            turnMotor.set(0);
+        }
+
+    }
+
 }
 
 
