@@ -91,7 +91,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     //objects.motorCalculator.calculations(m_controller.getX(GenericHID.Hand.kRight), -m_controller.getY(GenericHID.Hand.kRight),m_controller.getX(GenericHID.Hand.kLeft), 8.5);
-    objects.motorCalculator.allWheelDrive(m_controller.getX(GenericHID.Hand.kLeft), m_controller.getY(GenericHID.Hand.kLeft), m_controller.getX(GenericHID.Hand.kRight), 0.2, 0.05);
+    objects.motorCalculator.allWheelDrive(m_controller.getX(GenericHID.Hand.kLeft), m_controller.getY(GenericHID.Hand.kLeft), m_controller.getX(GenericHID.Hand.kRight), 0.2, 0.2);
   }
 
   /**
