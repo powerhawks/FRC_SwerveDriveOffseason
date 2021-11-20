@@ -152,32 +152,34 @@ public class Calculations {
         /**
          * Determines the speed and direction for each motor
          */
-
+        xVal = Math.abs(xVal) > 0.03 ? xVal : 0;
+        yVal = Math.abs(yVal) > 0.03 ? yVal : 0;
+        rotVal = Math.abs(rotVal) > 0.03 ? rotVal : 0;
         // top right wheel 0
         double module0Angle = (3 * Math.PI) / 4; // angle from the center of the robot to the module
         double m0x = xVal + (rotVal * Math.cos(module0Angle)); // add the x components of the translation and rotation
         double m0y = yVal + (rotVal * Math.sin(module0Angle)); // add the y components of the translation and rotation
         double m0Speed = Math.sqrt( (Math.pow(m0x, 2)) + (Math.pow(m0y, 2))); // find the magnitude of the hypotenuse between the x and y components
-        double m0Angle = Math.atan2(m0y, m0x); // find the angle that the x and y vals make (IMPORTANT! This range is -pi to pi, could break something by not being 0 to 2pi)
+        double m0Angle = Math.atan2(m0y, m0x) + Math.PI; // find the angle that the x and y vals make (IMPORTANT! This range is -pi to pi, could break something by not being 0 to 2pi)
 
         // top left wheel 1
         double module1Angle = (5 * Math.PI) / 4; // angle from the center of the robot to the module
         double m1x = xVal + (rotVal * Math.cos(module1Angle)); // add the x components of the translation and rotation
         double m1y = yVal + (rotVal * Math.sin(module1Angle)); // add the y components of the translation and rotation
         double m1Speed = Math.sqrt( (Math.pow(m1x, 2)) + (Math.pow(m1y, 2))); // find the magnitude of the hypotenuse between the x and y components
-        double m1Angle = Math.atan2(m1y, m1x); // find the angle that the x and y vals make (IMPORTANT! This range is -pi to pi, could break something by not being 0 to 2pi)
+        double m1Angle = Math.atan2(m1y, m1x) + Math.PI; // find the angle that the x and y vals make (IMPORTANT! This range is -pi to pi, could break something by not being 0 to 2pi)
 
         // bottom left wheel 2
         double module2Angle = (7 * Math.PI) / 4; // angle from the center of the robot to the module
         double m2x = xVal + (rotVal * Math.cos(module2Angle)); // add the x components of the translation and rotation
         double m2y = yVal + (rotVal * Math.sin(module2Angle)); // add the y components of the translation and rotation
         double m2Speed = Math.sqrt( (Math.pow(m2x, 2)) + (Math.pow(m2y, 2))); // find the magnitude of the hypotenuse between the x and y components
-        double m2Angle = Math.atan2(m2y, m2x); // find the angle that the x and y vals make (IMPORTANT! This range is -pi to pi, could break something by not being 0 to 2pi)
+        double m2Angle = Math.atan2(m2y, m2x) + Math.PI; // find the angle that the x and y vals make (IMPORTANT! This range is -pi to pi, could break something by not being 0 to 2pi)
 
         // bottom right wheel 3
         double module3Angle = (1 * Math.PI) / 4; // angle from the center of the robot to the module
-        double m3x = xVal + (rotVal * Math.cos(module3Angle)); // add the x components of the translation and rotation
-        double m3y = yVal + (rotVal * Math.sin(module3Angle)); // add the y components of the translation and rotation
+        double m3x = xVal + (rotVal * Math.cos(module3Angle - (Math.PI / 2))); // add the x components of the translation and rotation
+        double m3y = yVal + (rotVal * Math.sin(module3Angle - (Math.PI / 2))); // add the y components of the translation and rotation
         double m3Speed = Math.sqrt( (Math.pow(m3x, 2)) + (Math.pow(m3y, 2))); // find the magnitude of the hypotenuse between the x and y components
         double m3Angle = Math.atan2(m3y, m3x); // find the angle that the x and y vals make (IMPORTANT! This range is -pi to pi, could break something by not being 0 to 2pi)
 
@@ -195,8 +197,8 @@ public class Calculations {
              m2Speed /= maxWheelSpeed;
              m3Speed /= maxWheelSpeed;
          }
-         
-         setSwerveUnitState(Motors.driveMotor3, Motors.turnMotor3, m_turningEncoderBottomRight, m3Speed, m3Angle, velocityScalerDrive, velocityScalerRotate);
+        SmartDashboard.putNumber("RawValue", m3Angle);
+        setSwerveUnitState(Motors.driveMotor3, Motors.turnMotor3, m_turningEncoderBottomRight, m3Speed, m3Angle, velocityScalerDrive, velocityScalerRotate);
 
     }
 
@@ -219,7 +221,7 @@ public class Calculations {
         }
 
         if (Math.abs(limitedDistance) > (Math.PI / 32)){
-            rotateMotor.set(rotationDirection ? -rotateMotorSpeedScale : rotateMotorSpeedScale);
+            rotateMotor.set(rotationDirection ? rotateMotorSpeedScale : -rotateMotorSpeedScale);
         }
         else {
             rotateMotor.set(0);
