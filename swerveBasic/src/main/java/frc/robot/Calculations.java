@@ -196,7 +196,7 @@ public class Calculations {
              m3Speed /= maxWheelSpeed;
          }
          
-         setSwerveUnitState(Motors.driveMotor3, Motors.turnMotor3, m_turningEncoderBottomRight, m3Speed, m3Angle, 0.2, 0.05);
+         setSwerveUnitState(Motors.driveMotor3, Motors.turnMotor3, m_turningEncoderBottomRight, m3Speed, m3Angle, velocityScalerDrive, velocityScalerRotate);
 
     }
 
