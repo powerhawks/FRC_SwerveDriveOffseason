@@ -159,7 +159,7 @@ public class Calculations {
         yVal = Math.abs(yVal) > 0.03 ? yVal : 0;
         rotVal = Math.abs(rotVal) > 0.03 ? rotVal : 0;
         // top right wheel 0
-        double module0Angle = (1 * Math.PI) / 4; // angle from the center of the robot to the module
+        double module0Angle = (3 * Math.PI) / 4; // angle from the center of the robot to the module
         double m0x = xVal + (rotVal * Math.cos(module0Angle)); // add the x components of the translation and rotation
         double m0y = yVal + (rotVal * Math.sin(module0Angle)); // add the y components of the translation and rotation
         double m0Speed = Math.sqrt( (Math.pow(m0x, 2)) + (Math.pow(m0y, 2))); // find the magnitude of the hypotenuse between the x and y components
@@ -169,7 +169,7 @@ public class Calculations {
         SmartDashboard.putNumber("m0Acual", ((m_encoderModule0.getRaw()/4096.0)%1)*(2*Math.PI));
 
         // top left wheel 1
-        double module1Angle = (7 * Math.PI) / 4; // angle from the center of the robot to the module
+        double module1Angle = (5 * Math.PI) / 4; // angle from the center of the robot to the module
         double m1x = xVal + (rotVal * Math.cos(module1Angle)); // add the x components of the translation and rotation
         double m1y = yVal + (rotVal * Math.sin(module1Angle)); // add the y components of the translation and rotation
         double m1Speed = Math.sqrt( (Math.pow(m1x, 2)) + (Math.pow(m1y, 2))); // find the magnitude of the hypotenuse between the x and y components
@@ -179,7 +179,7 @@ public class Calculations {
         SmartDashboard.putNumber("m1Acual", ((m_encoderModule1.getRaw()/4096.0)%1)*(2*Math.PI));
 
         // bottom left wheel 2
-        double module2Angle = (5 * Math.PI) / 4; // angle from the center of the robot to the module
+        double module2Angle = (7 * Math.PI) / 4; // angle from the center of the robot to the module
         double m2x = xVal + (rotVal * Math.cos(module2Angle)); // add the x components of the translation and rotation
         double m2y = yVal + (rotVal * Math.sin(module2Angle)); // add the y components of the translation and rotation
         double m2Speed = Math.sqrt( (Math.pow(m2x, 2)) + (Math.pow(m2y, 2))); // find the magnitude of the hypotenuse between the x and y components
@@ -189,7 +189,7 @@ public class Calculations {
         SmartDashboard.putNumber("m2Acual", ((m_encoderModule2.getRaw()/4096.0)%1)*(2*Math.PI));
 
         //bottom right wheel 3
-        double module3Angle = (3 * Math.PI) / 4; // angle from the center of the robot to the module
+        double module3Angle = (1 * Math.PI) / 4; // angle from the center of the robot to the module
         double m3x = xVal + (rotVal * Math.cos(module3Angle)); // add the x components of the translation and rotation
         double m3y = yVal + (rotVal * Math.sin(module3Angle)); // add the y components of the translation and rotation
         double m3Speed = Math.sqrt( (Math.pow(m3x, 2)) + (Math.pow(m3y, 2))); // find the magnitude of the hypotenuse between the x and y components
@@ -197,7 +197,7 @@ public class Calculations {
         m3Angle = m3Angle < 0 ? m3Angle + (2 * Math.PI) : m3Angle;
         SmartDashboard.putNumber("m3Angle", m3Angle);
         SmartDashboard.putNumber("m3Acual", ((m_encoderModule3.getRaw()/4096.0)%1)*(2*Math.PI));
-
+        
         
         /**
          * Normalizes wheel speeds so no wheel is going over 100 percent
