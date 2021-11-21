@@ -4,6 +4,7 @@ import frc.robot.Objects;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.controller.PIDController;
 import java.math.*;
 
 import com.revrobotics.CANSparkMax;
@@ -14,6 +15,7 @@ public class Calculations {
     private final Encoder m_encoderModule1 = new Encoder(2,3);
     private final Encoder m_encoderModule2 = new Encoder(4,5);
     private final Encoder m_encoderModule3 = new Encoder(6,7);
+
     public Calculations () {
     
     }
@@ -154,9 +156,9 @@ public class Calculations {
         /**
          * Determines the speed and direction for each motor
          */
-        xVal = Math.abs(xVal) > 0.03 ? xVal : 0;
-        yVal = Math.abs(yVal) > 0.03 ? yVal : 0;
-        rotVal = Math.abs(rotVal) > 0.08 ? rotVal : 0;
+        xVal = Math.abs(xVal) > 0.005 ? xVal : 0;
+        yVal = Math.abs(yVal) > 0.005 ? yVal : 0;
+        rotVal = Math.abs(rotVal) > 0.005 ? rotVal : 0;
         // top right wheel 0
         double module0Angle = (3 * Math.PI) / 4; // angle from the center of the robot to the module
         double m0x = xVal + (rotVal * Math.cos(module0Angle)); // add the x components of the translation and rotation
@@ -212,9 +214,9 @@ public class Calculations {
              m3Speed /= maxWheelSpeed;
          }
         SmartDashboard.putNumber("RawValue", m3Angle);
-        setSwerveUnitState(Motors.driveMotor0, Motors.turnMotor0, m_encoderModule0, m0Speed, m0Angle, velocityScalerDrive, velocityScalerRotate);
-        setSwerveUnitState(Motors.driveMotor1, Motors.turnMotor1, m_encoderModule1, m1Speed, m1Angle, velocityScalerDrive, velocityScalerRotate);
-        setSwerveUnitState(Motors.driveMotor2, Motors.turnMotor2, m_encoderModule2, m2Speed, m2Angle, velocityScalerDrive, velocityScalerRotate);
+        // setSwerveUnitState(Motors.driveMotor0, Motors.turnMotor0, m_encoderModule0, m0Speed, m0Angle, velocityScalerDrive, velocityScalerRotate);
+        // setSwerveUnitState(Motors.driveMotor1, Motors.turnMotor1, m_encoderModule1, m1Speed, m1Angle, velocityScalerDrive, velocityScalerRotate);
+        // setSwerveUnitState(Motors.driveMotor2, Motors.turnMotor2, m_encoderModule2, m2Speed, m2Angle, velocityScalerDrive, velocityScalerRotate);
         setSwerveUnitState(Motors.driveMotor3, Motors.turnMotor3, m_encoderModule3, m3Speed, m3Angle, velocityScalerDrive, velocityScalerRotate);
 
     }
@@ -228,7 +230,6 @@ public class Calculations {
         double encoderRotation = ( (swerveUnitEncoder.getRaw() / 4096.0) % 1) * ( 2 * Math.PI); //convert the encoder val to radians. the mod 1 is because the rotation can go above and below a full rotation, so mod 1 removes extras
         if (encoderRotation < 0 ) {
             encoderRotation *= -1;
-        } else {
             encoderRotation = (2 * Math.PI) - encoderRotation;
         }
         double signedDiff = 0.0;
@@ -243,8 +244,12 @@ public class Calculations {
             signedDiff = modDiff;
             if (encoderRotation > moduleAngle) signedDiff = signedDiff * -1;
         }
-        if (Math.abs(signedDiff) > (Math.PI / 32)){ //window controls jitter
-            rotateMotor.set(signedDiff > 0 ? -.05 : .05);
+        double percentError = signedDiff / (Math.PI);
+        SmartDashboard.putNumber("encoderRotation", encoderRotation);
+        SmartDashboard.putNumber("signedDiff", signedDiff);
+        SmartDashboard.putNumber("percentError", percentError);
+        if (Math.abs(signedDiff) > (Math.PI / 128)){
+            rotateMotor.set(-percentError * rotateMotorSpeedScale); //proportional error control
         }
         else {
             rotateMotor.set(0);
