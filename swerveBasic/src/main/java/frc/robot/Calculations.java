@@ -247,16 +247,8 @@ public class Calculations {
 
         driveMotor.set(Math.cos(signedDiff) * driveMotorSpeed * driveMotorSpeedScale); //sets the drive motor power
 
-        double percentError = signedDiff / (Math.PI);
-        SmartDashboard.putNumber("encoderRotation", encoderRotation);
-        SmartDashboard.putNumber("signedDiff", signedDiff);
-        SmartDashboard.putNumber("percentError", percentError);
-        if (Math.abs(signedDiff) > (Math.PI / 128)){
-            rotateMotor.set(-percentError * rotateMotorSpeedScale); //proportional error control
-        }
-        else {
-            rotateMotor.set(0);
-        }
+        double percentError = signedDiff / (2 * Math.PI);
+        rotateMotor.set(-percentError * rotateMotorSpeedScale); //proportional error control
     }
 
     public double turnAcceleration (double difference) {
