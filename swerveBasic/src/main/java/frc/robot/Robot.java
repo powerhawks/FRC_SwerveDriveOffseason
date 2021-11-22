@@ -37,6 +37,7 @@ public class Robot extends TimedRobot {
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
+    Objects.navx.zeroYaw();
   }
 
   /**
@@ -94,7 +95,7 @@ public class Robot extends TimedRobot {
     double translateY = m_controller.getY(GenericHID.Hand.kLeft);
     double rotate =     m_controller.getX(GenericHID.Hand.kRight);
     //objects.motorCalculator.calculations(m_controller.getX(GenericHID.Hand.kRight), -m_controller.getY(GenericHID.Hand.kRight),m_controller.getX(GenericHID.Hand.kLeft), 8.5);
-    objects.motorCalculator.allWheelDrive(translateX, translateY, rotate, 0.1, 0.5);
+    objects.motorCalculator.allWheelDrive(translateX, translateY, rotate, 0.1, 0.5, true);
   }
 
   /**

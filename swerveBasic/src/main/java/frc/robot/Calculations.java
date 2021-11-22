@@ -18,7 +18,7 @@ public class Calculations {
     public Calculations () {
     
     }
-
+    
     /**
      * Takes in three joystick values and drives all four swerve units <br><br>
      * Motors are numbered 0 through 3, starting in the top right (first quadrant) <br><br>
@@ -35,8 +35,11 @@ public class Calculations {
      * @param velocityScalerRotate
      * <ul><li> Decimal percentage to run the rotation motor (usually 0 to 1 but can be more or less) </ul></li>
      */
-    public void allWheelDrive(double xVal, double yVal, double rotVal, double velocityScalerDrive, double velocityScalerRotate) {
-        
+    public void allWheelDrive(double xVal, double yVal, double rotVal, double velocityScalerDrive, double velocityScalerRotate, boolean fieldRelative) {
+        if (fieldRelative) {
+            xVal = fieldRelative(xVal, yVal, true);
+            yVal = fieldRelative(xVal, yVal, false);
+        }
         /**
          * Sets the deadband for the controller
          */
@@ -139,6 +142,23 @@ public class Calculations {
             if (encoderRotation > moduleAngle) signedDiff = signedDiff * -1;
         }
         return signedDiff;
+    }
+    /**
+     * ENSURE START IS ALWAYS Y+ AXIS AWAY FROM THE CONTROLLER
+     * @param xVal the xValue of the controller
+     * @param yVal y value of the controller
+     * @param wanted component wanted as return (CAPITAL LETTERS, true = x, false = y)
+     * @return xValue of the robot relativ to the field
+     */
+    public double fieldRelative (double xVal, double yVal, Boolean wanted) {
+        double currentOrient = Objects.navx.getYaw();
+        double xValCalc = (Math.cos(currentOrient+(2*Math.PI))*xVal)+(Math.cos(currentOrient+(Math.PI))*yVal);
+        double yValCalc = (Math.sin(currentOrient+(2*Math.PI))*xVal)+(Math.sin(currentOrient+(Math.PI))*yVal);
+        if (wanted) {
+            return xValCalc;
+        } else {
+            return yValCalc;
+        }
     }
 
 
