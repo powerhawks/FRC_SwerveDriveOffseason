@@ -104,12 +104,28 @@ public class Calculations {
     }
 
     public void setSwerveUnitState(CANSparkMax driveMotor, CANSparkMax rotateMotor, Encoder swerveUnitEncoder, double driveMotorSpeed, double moduleAngle, double driveMotorSpeedScale, double rotateMotorSpeedScale) {
-        driveMotor.set(driveMotorSpeed * driveMotorSpeedScale); //sets the drive motor power
         
         /**
          * The following section is the rotation direction optimizer, and finds the shortest path to rotate the motor
          */
         double encoderRotation = ( (swerveUnitEncoder.getRaw() / 4096.0) % 1) * ( 2 * Math.PI); //convert the encoder val to radians. the mod 1 is because the rotation can go above and below a full rotation, so mod 1 removes extras
+        double signedDiffNormal = closestAngleCalculator(encoderRotation, moduleAngle);
+        double signedDiffReverse = closestAngleCalculator(encoderRotation, moduleAngle - Math.PI);
+        double signedDiff = 0.0;
+        if (Math.abs(signedDiffNormal) <= Math.abs(signedDiffReverse)) {
+            signedDiff = signedDiffNormal;
+        }
+        else {
+            driveMotorSpeedScale = -driveMotorSpeedScale; //run the drive wheel backwards
+            signedDiff = signedDiffReverse;
+        }
+
+        driveMotor.set(Math.cos(signedDiff) * driveMotorSpeed * driveMotorSpeedScale); //drive motor power is cosine of error delta so the wheels don't fight each other
+        double percentError = signedDiff / (Math.PI); //proportion error control
+        rotateMotor.set(-percentError * rotateMotorSpeedScale); //proportional error control
+    }
+
+    public double closestAngleCalculator(double encoderRotation, double moduleAngle) {
         double signedDiff = 0.0;
         double rawDiff = encoderRotation > moduleAngle ? encoderRotation - moduleAngle : moduleAngle - encoderRotation;
         double modDiff = rawDiff % (2 * Math.PI);
@@ -122,10 +138,7 @@ public class Calculations {
             signedDiff = modDiff;
             if (encoderRotation > moduleAngle) signedDiff = signedDiff * -1;
         }
-
-        driveMotor.set(Math.cos(signedDiff) * driveMotorSpeed * driveMotorSpeedScale); //drive motor power is cos of error delta so the wheels don't fight each other
-        double percentError = signedDiff / (Math.PI);
-        rotateMotor.set(-percentError * rotateMotorSpeedScale); //proportional error control
+        return signedDiff;
     }
 
 
