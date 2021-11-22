@@ -152,8 +152,8 @@ public class Calculations {
      */
     public double fieldRelative (double xVal, double yVal, Boolean wanted) {
         double currentOrient = Objects.navx.getYaw();
-        double xValCalc = (Math.cos(currentOrient+(2*Math.PI))*xVal)+(Math.cos(currentOrient+(Math.PI))*yVal);
-        double yValCalc = (Math.sin(currentOrient+(2*Math.PI))*xVal)+(Math.sin(currentOrient+(Math.PI))*yVal);
+        double xValCalc = (Math.cos(currentOrient+(Math.PI))*xVal)+(Math.cos(currentOrient+(Math.PI/2))*yVal);
+        double yValCalc = (Math.sin(currentOrient+(Math.PI))*xVal)+(Math.sin(currentOrient+(Math.PI/2))*yVal);
         if (wanted) {
             return xValCalc;
         } else {
