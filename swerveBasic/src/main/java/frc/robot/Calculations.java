@@ -9,12 +9,12 @@ import java.math.*;
 
 import com.revrobotics.CANSparkMax;
 public class Calculations {
-    //constructor lmao
+    //constructor lmao 
     private final Encoder m_encoderModule0 = new Encoder(0,1);
     private final Encoder m_encoderModule1 = new Encoder(2,3);
     private final Encoder m_encoderModule2 = new Encoder(4,5);
     private final Encoder m_encoderModule3 = new Encoder(6,7);
-
+    //test comment
     public Calculations () {
     
     }
