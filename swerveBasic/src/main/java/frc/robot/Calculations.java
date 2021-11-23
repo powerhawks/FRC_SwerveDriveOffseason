@@ -36,10 +36,11 @@ public class Calculations {
      * <ul><li> Decimal percentage to run the rotation motor (usually 0 to 1 but can be more or less) </ul></li>
      */
     public void allWheelDrive(double xVal, double yVal, double rotVal, double velocityScalerDrive, double velocityScalerRotate, boolean fieldRelative) {
-        if (fieldRelative) {
-            xVal = fieldRelative(xVal, yVal, true);
-            yVal = fieldRelative(xVal, yVal, false);
-        }
+        // if (fieldRelative) {
+        //     xVal = fieldRelative(xVal, yVal, true);
+        //     yVal = fieldRelative(xVal, yVal, false);
+        // }
+
         /**
          * Sets the deadband for the controller
          */
@@ -98,15 +99,15 @@ public class Calculations {
         /**
          * Sends the direction and speed of each module to the motor driver function
          */
-        
-        setSwerveUnitState(Motors.driveMotor0, Motors.turnMotor0, m_encoderModule0, m0Speed, m0Angle, velocityScalerDrive, velocityScalerRotate);
-        setSwerveUnitState(Motors.driveMotor1, Motors.turnMotor1, m_encoderModule1, m1Speed, m1Angle, velocityScalerDrive, velocityScalerRotate);
-        setSwerveUnitState(Motors.driveMotor2, Motors.turnMotor2, m_encoderModule2, m2Speed, m2Angle, velocityScalerDrive, velocityScalerRotate);
-        setSwerveUnitState(Motors.driveMotor3, Motors.turnMotor3, m_encoderModule3, m3Speed, m3Angle, velocityScalerDrive, velocityScalerRotate);
+
+        setSwerveUnitState(Motors.driveMotor0, Motors.turnMotor0, m_encoderModule0, m0Speed, m0Angle, velocityScalerDrive, velocityScalerRotate, fieldRelative);
+        setSwerveUnitState(Motors.driveMotor1, Motors.turnMotor1, m_encoderModule1, m1Speed, m1Angle, velocityScalerDrive, velocityScalerRotate, fieldRelative);
+        setSwerveUnitState(Motors.driveMotor2, Motors.turnMotor2, m_encoderModule2, m2Speed, m2Angle, velocityScalerDrive, velocityScalerRotate, fieldRelative);
+        setSwerveUnitState(Motors.driveMotor3, Motors.turnMotor3, m_encoderModule3, m3Speed, m3Angle, velocityScalerDrive, velocityScalerRotate, fieldRelative);
 
     }
 
-    public void setSwerveUnitState(CANSparkMax driveMotor, CANSparkMax rotateMotor, Encoder swerveUnitEncoder, double driveMotorSpeed, double moduleAngle, double driveMotorSpeedScale, double rotateMotorSpeedScale) {
+    public void setSwerveUnitState(CANSparkMax driveMotor, CANSparkMax rotateMotor, Encoder swerveUnitEncoder, double driveMotorSpeed, double moduleAngle, double driveMotorSpeedScale, double rotateMotorSpeedScale, boolean fieldRelative) {
         
         /**
          * The following section is the rotation direction optimizer, and finds the shortest path to rotate the motor
@@ -121,6 +122,9 @@ public class Calculations {
         else {
             driveMotorSpeedScale = -driveMotorSpeedScale; //run the drive wheel backwards
             signedDiff = signedDiffReverse;
+        }
+        if (fieldRelative) {
+            signedDiff += (Objects.navx.getYaw() * (Math.PI / 180));
         }
 
         driveMotor.set(Math.cos(signedDiff) * driveMotorSpeed * driveMotorSpeedScale); //drive motor power is cosine of error delta so the wheels don't fight each other
