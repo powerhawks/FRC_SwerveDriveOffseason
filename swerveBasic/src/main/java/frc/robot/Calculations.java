@@ -151,9 +151,17 @@ public class Calculations {
      * @return xValue of the robot relativ to the field
      */
     public double fieldRelative (double xVal, double yVal, Boolean wanted) {
-        double currentOrient = Objects.navx.getYaw();
-        double xValCalc = (Math.cos(currentOrient+(Math.PI))*xVal)+(Math.cos(currentOrient+(Math.PI/2))*yVal);
-        double yValCalc = (Math.sin(currentOrient+(Math.PI))*xVal)+(Math.sin(currentOrient+(Math.PI/2))*yVal);
+        double currentOrient = -(Objects.navx.getYaw() * (Math.PI / 180));
+        SmartDashboard.putNumber("NavX Angle", currentOrient);
+        // double xValCalc = (Math.cos(currentOrient)*xVal)+(Math.cos(currentOrient+(Math.PI/2))*yVal);
+        // double yValCalc = (Math.sin(currentOrient)*xVal)+(Math.sin(currentOrient+(Math.PI/2))*yVal);
+
+        double magnitude = Math.sqrt((Math.pow(xVal, 2)) + Math.pow(yVal, 2));
+        double angle = Math.atan2(yVal, xVal);
+        angle += currentOrient;
+        double xValCalc = magnitude * Math.cos(angle);
+        double yValCalc = magnitude * Math.sin(angle);
+
         if (wanted) {
             return xValCalc;
         } else {
