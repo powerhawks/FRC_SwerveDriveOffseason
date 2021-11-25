@@ -5,18 +5,37 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj.Counter;
 import java.math.*;
 
 import com.revrobotics.CANSparkMax;
-public class Calculations {
+public class swerveDrive {
     //constructor lmao 
     private final Encoder m_encoderModule0 = new Encoder(0,1);
     private final Encoder m_encoderModule1 = new Encoder(2,3);
     private final Encoder m_encoderModule2 = new Encoder(4,5);
     private final Encoder m_encoderModule3 = new Encoder(6,7);
-    //test comment
-    public Calculations () {
+
+    private double maxPulseWidthSeconds = 0.004096; //4096 microseconds, 244 hz
+    private final Counter m_module0PWM = new Counter(Counter.Mode.kSemiperiod);
+    private final Counter m_module1PWM = new Counter(Counter.Mode.kSemiperiod);
+    private final Counter m_module2PWM = new Counter(Counter.Mode.kSemiperiod);
+    private final Counter m_module3PWM = new Counter(Counter.Mode.kSemiperiod);
     
+
+    //test comment
+    public swerveDrive () {
+        //navx expansion dio ports
+        m_module0PWM.setUpSource(10);
+        m_module1PWM.setUpSource(11);
+        m_module2PWM.setUpSource(12);
+        m_module3PWM.setUpSource(13);
+
+        //count from rising edge to falling edge
+        m_module0PWM.setSemiPeriodMode(true);
+        m_module1PWM.setSemiPeriodMode(true);
+        m_module2PWM.setSemiPeriodMode(true);
+        m_module3PWM.setSemiPeriodMode(true);
     }
     
     /**
@@ -178,6 +197,17 @@ public class Calculations {
         } else {
             return yValCalc;
         }
+    }
+
+    public void homeAllMotors() {
+        double m0pwmDegrees = (m_module0PWM.getPeriod() / maxPulseWidthSeconds) * 360;
+        double m1pwmDegrees = (m_module1PWM.getPeriod() / maxPulseWidthSeconds) * 360;
+        double m2pwmDegrees = (m_module2PWM.getPeriod() / maxPulseWidthSeconds) * 360;
+        double m3pwmDegrees = (m_module3PWM.getPeriod() / maxPulseWidthSeconds) * 360;
+        SmartDashboard.putNumber("module 0 pwm degrees", m0pwmDegrees);
+        SmartDashboard.putNumber("module 1 pwm degrees", m1pwmDegrees);
+        SmartDashboard.putNumber("module 2 pwm degrees", m2pwmDegrees);
+        SmartDashboard.putNumber("module 3 pwm degrees", m3pwmDegrees);
     }
 
 
