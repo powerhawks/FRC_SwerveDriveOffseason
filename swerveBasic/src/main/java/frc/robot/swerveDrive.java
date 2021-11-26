@@ -5,37 +5,36 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.controller.PIDController;
-import edu.wpi.first.wpilibj.Counter;
+import edu.wpi.first.wpilibj.DutyCycle;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.DigitalInput;
 import java.math.*;
 
 import com.revrobotics.CANSparkMax;
 public class swerveDrive {
     //constructor lmao 
-    private final Encoder m_encoderModule0 = new Encoder(0,1);
-    private final Encoder m_encoderModule1 = new Encoder(2,3);
-    private final Encoder m_encoderModule2 = new Encoder(4,5);
-    private final Encoder m_encoderModule3 = new Encoder(6,7);
 
-    private double maxPulseWidthSeconds = 0.004096; //4096 microseconds, 244 hz
-    private final Counter m_module0PWM = new Counter(Counter.Mode.kSemiperiod);
-    private final Counter m_module1PWM = new Counter(Counter.Mode.kSemiperiod);
-    private final Counter m_module2PWM = new Counter(Counter.Mode.kSemiperiod);
-    private final Counter m_module3PWM = new Counter(Counter.Mode.kSemiperiod);
+    // private final Encoder m_encoderModule0 = new Encoder(0,1);
+    // private final Encoder m_encoderModule1 = new Encoder(2,3);
+    // private final Encoder m_encoderModule2 = new Encoder(4,5);
+    // private final Encoder m_encoderModule3 = new Encoder(6,7);
+
+    DigitalInput mod0PwmPin = new DigitalInput(10);
+    DutyCycle mod0PWM = new DutyCycle(mod0PwmPin);
+
+    DigitalInput mod1PwmPin = new DigitalInput(11);
+    DutyCycle mod1PWM = new DutyCycle(mod1PwmPin);
+
+    DigitalInput mod2PwmPin = new DigitalInput(12);
+    DutyCycle mod2PWM = new DutyCycle(mod2PwmPin);
+    
+    DigitalInput mod3PwmPin = new DigitalInput(13);
+    DutyCycle mod3PWM = new DutyCycle(mod3PwmPin);
     
 
     //test comment
     public swerveDrive () {
-        //navx expansion dio ports
-        m_module0PWM.setUpSource(10);
-        m_module1PWM.setUpSource(11);
-        m_module2PWM.setUpSource(12);
-        m_module3PWM.setUpSource(13);
 
-        //count from rising edge to falling edge
-        m_module0PWM.setSemiPeriodMode(true);
-        m_module1PWM.setSemiPeriodMode(true);
-        m_module2PWM.setSemiPeriodMode(true);
-        m_module3PWM.setSemiPeriodMode(true);
     }
     
     /**
@@ -119,19 +118,27 @@ public class swerveDrive {
          * Sends the direction and speed of each module to the motor driver function
          */
 
-        setSwerveUnitState(Motors.driveMotor0, Motors.turnMotor0, m_encoderModule0, m0Speed, m0Angle, velocityScalerDrive, velocityScalerRotate);
-        setSwerveUnitState(Motors.driveMotor1, Motors.turnMotor1, m_encoderModule1, m1Speed, m1Angle, velocityScalerDrive, velocityScalerRotate);
-        setSwerveUnitState(Motors.driveMotor2, Motors.turnMotor2, m_encoderModule2, m2Speed, m2Angle, velocityScalerDrive, velocityScalerRotate);
-        setSwerveUnitState(Motors.driveMotor3, Motors.turnMotor3, m_encoderModule3, m3Speed, m3Angle, velocityScalerDrive, velocityScalerRotate);
+        double mod0CurrAngle = -((mod0PWM.getOutput() - (0.8174)) % 1) * (2 * Math.PI);
+        SmartDashboard.putNumber("mod0currAngle", mod0CurrAngle);
+        double mod1CurrAngle = -((mod1PWM.getOutput() - (0.1154)) % 1) * (2 * Math.PI);
+        double mod2CurrAngle = -((mod2PWM.getOutput() - (0.1755)) % 1) * (2 * Math.PI);
+        double mod3CurrAngle = -((mod3PWM.getOutput() - (0.8171)) % 1) * (2 * Math.PI);
+
+
+
+        setSwerveUnitState(Motors.driveMotor0, Motors.turnMotor0, mod0CurrAngle, m0Speed, m0Angle, velocityScalerDrive, velocityScalerRotate);
+        setSwerveUnitState(Motors.driveMotor1, Motors.turnMotor1, mod1CurrAngle, m1Speed, m1Angle, velocityScalerDrive, velocityScalerRotate);
+        setSwerveUnitState(Motors.driveMotor2, Motors.turnMotor2, mod2CurrAngle, m2Speed, m2Angle, velocityScalerDrive, velocityScalerRotate);
+        setSwerveUnitState(Motors.driveMotor3, Motors.turnMotor3, mod3CurrAngle, m3Speed, m3Angle, velocityScalerDrive, velocityScalerRotate);
 
     }
 
-    public void setSwerveUnitState(CANSparkMax driveMotor, CANSparkMax rotateMotor, Encoder swerveUnitEncoder, double driveMotorSpeed, double moduleAngle, double driveMotorSpeedScale, double rotateMotorSpeedScale) {
+    public void setSwerveUnitState(CANSparkMax driveMotor, CANSparkMax rotateMotor, double swerveUnitEncoder, double driveMotorSpeed, double moduleAngle, double driveMotorSpeedScale, double rotateMotorSpeedScale) {
         
         /**
          * The following section is the rotation direction optimizer, and finds the shortest path to rotate the motor
          */
-        double encoderRotation = ( (swerveUnitEncoder.getRaw() / 4096.0) % 1) * ( 2 * Math.PI); //convert the encoder val to radians. the mod 1 is because the rotation can go above and below a full rotation, so mod 1 removes extras
+        double encoderRotation = swerveUnitEncoder; //convert the encoder val to radians. the mod 1 is because the rotation can go above and below a full rotation, so mod 1 removes extras
         double signedDiffNormal = closestAngleCalculator(encoderRotation, moduleAngle);
         double signedDiffReverse = closestAngleCalculator(encoderRotation, moduleAngle - Math.PI);
         double signedDiff = 0.0;
@@ -197,17 +204,6 @@ public class swerveDrive {
         } else {
             return yValCalc;
         }
-    }
-
-    public void homeAllMotors() {
-        double m0pwmDegrees = (m_module0PWM.getPeriod() / maxPulseWidthSeconds) * 360;
-        double m1pwmDegrees = (m_module1PWM.getPeriod() / maxPulseWidthSeconds) * 360;
-        double m2pwmDegrees = (m_module2PWM.getPeriod() / maxPulseWidthSeconds) * 360;
-        double m3pwmDegrees = (m_module3PWM.getPeriod() / maxPulseWidthSeconds) * 360;
-        SmartDashboard.putNumber("module 0 pwm degrees", m0pwmDegrees);
-        SmartDashboard.putNumber("module 1 pwm degrees", m1pwmDegrees);
-        SmartDashboard.putNumber("module 2 pwm degrees", m2pwmDegrees);
-        SmartDashboard.putNumber("module 3 pwm degrees", m3pwmDegrees);
     }
 
 
