@@ -55,16 +55,17 @@ public class swerveDrive {
      */
     public void allWheelDrive(double xVal, double yVal, double rotVal, double velocityScalerDrive, double velocityScalerRotate, boolean fieldRelative) {
         if (fieldRelative) {
-            xVal = fieldRelative(xVal, yVal, true);
-            yVal = fieldRelative(xVal, yVal, false);
+            double[] newVals = fieldRelative(xVal, yVal);
+            xVal = newVals[0];
+            yVal = newVals[1];
         }
 
         /**
          * Sets the deadband for the controller
          */
-        xVal = Math.abs(xVal) > 0.03 ? xVal : 0;
-        yVal = Math.abs(yVal) > 0.03 ? yVal : 0;
-        rotVal = Math.abs(rotVal) > 0.03 ? rotVal : 0;
+        xVal = Math.abs(xVal) > 0.08 ? xVal : 0;
+        yVal = Math.abs(yVal) > 0.08 ? yVal : 0;
+        rotVal = Math.abs(rotVal) > 0.08 ? rotVal : 0;
 
         /**
          * Determines the speed and direction for each motor
@@ -115,17 +116,19 @@ public class swerveDrive {
         }
 
         /**
-         * Sends the direction and speed of each module to the motor driver function
+         * Gets the current pwm angle from each motor, attaches the correct offset, and then converts to radians
          */
-
+        
         double mod0CurrAngle = -((mod0PWM.getOutput() - (0.8174)) % 1) * (2 * Math.PI);
-        SmartDashboard.putNumber("mod0currAngle", mod0CurrAngle);
         double mod1CurrAngle = -((mod1PWM.getOutput() - (0.1154)) % 1) * (2 * Math.PI);
         double mod2CurrAngle = -((mod2PWM.getOutput() - (0.1755)) % 1) * (2 * Math.PI);
         double mod3CurrAngle = -((mod3PWM.getOutput() - (0.8171)) % 1) * (2 * Math.PI);
-
-
-
+        
+        
+        
+        /**
+         * Sends the direction and speed of each module to the motor driver function
+         */
         setSwerveUnitState(Motors.driveMotor0, Motors.turnMotor0, mod0CurrAngle, m0Speed, m0Angle, velocityScalerDrive, velocityScalerRotate);
         setSwerveUnitState(Motors.driveMotor1, Motors.turnMotor1, mod1CurrAngle, m1Speed, m1Angle, velocityScalerDrive, velocityScalerRotate);
         setSwerveUnitState(Motors.driveMotor2, Motors.turnMotor2, mod2CurrAngle, m2Speed, m2Angle, velocityScalerDrive, velocityScalerRotate);
@@ -171,39 +174,22 @@ public class swerveDrive {
         return signedDiff;
     }
     /**
-     * ENSURE START IS ALWAYS Y+ AXIS AWAY FROM THE CONTROLLER
+     * Calculates the rotated angle of the x and y controller inputs using the navx for field relative
+     * swerve drive
      * @param xVal the xValue of the controller
      * @param yVal y value of the controller
-     * @param wanted component wanted as return (CAPITAL LETTERS, true = x, false = y)
-     * @return xValue of the robot relativ to the field
+     * @return array of the [x, y] values
      */
-    public double fieldRelative (double xVal, double yVal, Boolean wanted) {
-        double currentOrient = (Objects.navx.getYaw() * (Math.PI / 180));
-        if (currentOrient < 0) {
-            currentOrient *= -1;
-            currentOrient = (Math.PI * 2) - currentOrient;
-        }
-        SmartDashboard.putNumber("NavX Offset", currentOrient);
-        // double xValCalc = (Math.cos(currentOrient)*xVal)+(Math.cos(currentOrient+(Math.PI/2))*yVal);
-        // double yValCalc = (Math.sin(currentOrient)*xVal)+(Math.sin(currentOrient+(Math.PI/2))*yVal);
+    public double[] fieldRelative (double xVal, double yVal) {
+        double currentOrient = (Objects.navx.getYaw() * (Math.PI / 180)); // current navx angle
+        double angle = Math.atan2(yVal , xVal); // find the original angle of the stick input
+        double mag = Math.sqrt(Math.pow(xVal, 2) + Math.pow(yVal, 2)); // find the original magnitude of the stick input
+        double correctedAngle = angle - currentOrient; // rotates the stick inputs by the navx offset
+        double xValCalc = mag * Math.cos(correctedAngle); // x component of the new angle
+        double yValCalc = mag * Math.sin(correctedAngle); // y component of the new angle
 
-        // double yValCalc = (xVal * Math.sin(currentOrient)) + (yVal * Math.cos(currentOrient));
-        // double xValCalc = (xVal * Math.cos(currentOrient)) - (yVal * Math.sin(currentOrient));
-
-        double mag = Math.sqrt(Math.pow(xVal, 2) + Math.pow(yVal, 2));
-        double angle = Math.atan2(yVal, xVal);
-        angle -= currentOrient;
-        angle %= Math.PI * 2;
-        SmartDashboard.putNumber("calculated new angle", angle);
-        double xValCalc = Math.cos(angle) * mag;
-        double yValCalc = Math.sin(angle) * mag;
-
-
-        if (wanted) {
-            return xValCalc;
-        } else {
-            return yValCalc;
-        }
+        double[] newValues = {xValCalc, yValCalc}; //return the numbers as an array so no temp variables are needed where the function is called
+        return newValues;
     }
 
 
