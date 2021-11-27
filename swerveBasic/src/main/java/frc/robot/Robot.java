@@ -94,8 +94,7 @@ public class Robot extends TimedRobot {
     double translateX = m_controller.getX(GenericHID.Hand.kLeft);
     double translateY = m_controller.getY(GenericHID.Hand.kLeft);
     double rotate =     m_controller.getX(GenericHID.Hand.kRight);
-    //objects.motorCalculator.calculations(m_controller.getX(GenericHID.Hand.kRight), -m_controller.getY(GenericHID.Hand.kRight),m_controller.getX(GenericHID.Hand.kLeft), 8.5);
-    objects.motorCalculator.allWheelDrive(translateX, translateY, rotate, 0.1, 0.7, true);
+    objects.swerveDrive.allWheelDrive(translateX, translateY, rotate, 0.1, 0.7, true);
   }
 
   /**

@@ -1,9 +1,9 @@
 package frc.robot;
-import frc.robot.swerveDrive;
+import frc.robot.SwerveDrive;
 import com.kauailabs.navx.frc.AHRS; 
 
 public class Objects {
-    swerveDrive motorCalculator = new swerveDrive();
+    SwerveDrive swerveDrive = new SwerveDrive();
     Motors motors = new Motors();
     public static AHRS navx = new AHRS();
 }
