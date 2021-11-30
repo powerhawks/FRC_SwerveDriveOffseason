@@ -94,7 +94,7 @@ public class Robot extends TimedRobot {
     double translateX = m_controller.getX(GenericHID.Hand.kLeft);
     double translateY = m_controller.getY(GenericHID.Hand.kLeft);
     double rotate =     m_controller.getX(GenericHID.Hand.kRight);
-    objects.swerveDrive.allWheelDrive(translateX, translateY, rotate, 0.1, 0.7, true);
+    //objects.swerveDrive.allWheelDrive(translateX, translateY, rotate, 0.1, 0.7, true); //Nobody gets to drive until Thursday, 12/2/21. 
   }
 
   /**
