@@ -9,6 +9,7 @@ package frc.robot;
 
 import frc.robot.Objects;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -28,6 +29,7 @@ public class Robot extends TimedRobot {
     private final SendableChooser<String> m_chooser = new SendableChooser<>();
     private Objects objects = new Objects();
     private final XboxController m_controller = new XboxController(0);
+    private final Joystick m_flightController = new Joystick(0);
     /**
      * This function is run when the robot is first started up and should be
      * used for any initialization code.
@@ -91,10 +93,13 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void teleopPeriodic() {
-        double translateX = m_controller.getX(GenericHID.Hand.kLeft);
-        double translateY = m_controller.getY(GenericHID.Hand.kLeft);
-        double rotate =     m_controller.getX(GenericHID.Hand.kRight);
-        objects.swerveDrive.allWheelDrive(translateX, translateY, rotate, 0.1, 0.7, true);
+        // double translateX = m_controller.getX(GenericHID.Hand.kLeft);
+        // double translateY = m_controller.getY(GenericHID.Hand.kLeft);
+        // double rotate =     m_controller.getX(GenericHID.Hand.kRight);
+        double translateX = m_flightController.getRawAxis(4);
+        double translateY = m_flightController.getRawAxis(2);
+        double rotate = m_flightController.getRawAxis(0);
+        objects.swerveDrive.allWheelDrive(translateX, translateY, rotate, 0.50, 1, true);
     }
 
     /**
