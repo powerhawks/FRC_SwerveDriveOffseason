@@ -1,6 +1,6 @@
 # README #
 
-This code is our built-from-scratch swerve drive system to prepare for the 2022 season. Finished December 2021 by N. Aldrige and R. McAllister.
+This code is built-from-scratch swerve drive system to prepare for the 2022 season. We designed this for the SDS Mk3 swerve drive units, but the logic can be adapted for almost any other unit. Finished December 2021 by N. Aldrige and R. McAllister.
 
 ### What is this repository for? ###
 
